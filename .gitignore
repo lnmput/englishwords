@@ -1,0 +1,19 @@
+/node_modules
+/.next
+/out
+/build
+/.vercel
+/coverage
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts.tmp
+
+# Local environment files
+.env*
+!.env.example
+
+# Package manager and debug logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
