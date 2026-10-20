@@ -13,7 +13,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Comic+Neue:wght@400;700&family=Quicksand:wght@500;700&family=Nunito:wght@500;700&family=Fredoka:wght@400;500&family=Playpen+Sans:wght@400;600&family=Patrick+Hand&family=Poppins:wght@500;800&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Comic+Neue:wght@400;700&family=Quicksand:wght@500;700&family=Nunito:wght@500;700&family=Fredoka:wght@400;500&family=Playpen+Sans:wght@400;600&family=Patrick+Hand&family=Kalam:wght@300;400;700&family=Poppins:wght@500;800&display=swap"
           rel="stylesheet"
         />
       </head>

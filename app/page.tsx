@@ -42,15 +42,16 @@ export default function Home() {
             <section className="form-section">
               <h2>书写样式</h2>
               <label htmlFor="font">练习字体</label>
-              <select id="font" defaultValue="skeleton">
+              <select id="font" defaultValue="Kalam">
+                <option value="Kalam">Kalam（轻 / 常规 / 粗体可调 · 推荐）</option>
+                <option value="Patrick Hand">Patrick Hand（清晰手写体 · 推荐）</option>
+                <option value="Andika">Andika（清晰规整）</option>
                 <option value="skeleton">标准书写体（推荐 · 单线笔画）</option>
-                <option value="Andika">Andika（儿童识字体）</option>
                 <option value="Comic Neue">Comic Neue（手写感）</option>
                 <option value="Quicksand">Quicksand（圆润）</option>
                 <option value="Nunito">Nunito（圆润粗体）</option>
                 <option value="Fredoka">Fredoka（可爱）</option>
                 <option value="Playpen Sans">Playpen Sans（手写）</option>
-                <option value="Patrick Hand">Patrick Hand（手写）</option>
                 <option value="Poppins">Poppins（几何）</option>
                 <option value="Arial">Arial（系统）</option>
                 <option value="Comic Sans MS">Comic Sans MS（系统）</option>
@@ -80,13 +81,6 @@ export default function Home() {
               <div className="row"><input type="checkbox" id="namedate" /><label htmlFor="namedate">显示姓名与日期</label></div>
             </section>
 
-            <div className="actions">
-              <button className="print-button" id="print" type="button">
-                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 6V3.5h8V6M6 14H4.5A1.5 1.5 0 0 1 3 12.5v-4A1.5 1.5 0 0 1 4.5 7h11A1.5 1.5 0 0 1 17 8.5v4a1.5 1.5 0 0 1-1.5 1.5H14" /><path d="M6 11.5h8v5H6zM14.5 9.5h.01" /></svg>
-                打印 / 保存为 PDF
-              </button>
-              <p className="print-note">A4 纸张 · 打印时选择「无边距」并开启「背景图形」</p>
-            </div>
             <p className="footnote">标准书写体支持 a–z，大写会自动转为小写。字体设置保存在本机浏览器。</p>
           </div>
         </aside>
@@ -95,8 +89,15 @@ export default function Home() {
           <div className="preview-heading">
             <div>
               <h2>预览练习纸</h2>
+              <div className="paper-spec"><span className="live-dot" />实时更新 <span className="spec-divider" /> A4 · 210 × 297 mm</div>
             </div>
-            <div className="paper-spec"><span className="live-dot" />实时更新 <span className="spec-divider" /> A4 · 210 × 297 mm</div>
+            <div className="preview-actions">
+              <button className="print-button" id="print" type="button">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 6V3.5h8V6M6 14H4.5A1.5 1.5 0 0 1 3 12.5v-4A1.5 1.5 0 0 1 4.5 7h11A1.5 1.5 0 0 1 17 8.5v4a1.5 1.5 0 0 1-1.5 1.5H14" /><path d="M6 11.5h8v5H6zM14.5 9.5h.01" /></svg>
+                打印 / 保存为 PDF
+              </button>
+              <p className="print-note">打印时选择「无边距」并开启「背景图形」</p>
+            </div>
           </div>
           <div className="pages" id="pages" />
           <p className="preview-caption">每一页都按 A4 实际尺寸排版，准备好后即可打印。</p>

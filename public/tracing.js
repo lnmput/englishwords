@@ -45,10 +45,12 @@ const SPACE = 36;
 const COLORS = ['#e03131', '#2563d9', '#e03131', '#2563d9'];
 
 /* ---------- 默认（最佳）设置 ---------- */
-const DEFAULTS = { font: 'skeleton', size: 14, letter: 0, wgap: 9, rgap: 4, bgap: 6, weight: 100,
+const DEFAULTS = { font: 'Kalam', size: 14, letter: 0, wgap: 9, rgap: 4, bgap: 6, weight: 100,
                    guide: true, second: true, fill: true, namedate: true };
 const UNIT = { size: 'mm', letter: '', wgap: 'mm', rgap: 'mm', bgap: 'mm', weight: '%' };
 let S = Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem('tracingSettings') || '{}'));
+// Migrate previous built-in defaults while preserving other saved font choices.
+if (S.font === 'skeleton' || S.font === 'Andika' || S.font === 'Patrick Hand') S.font = DEFAULTS.font;
 
 /* ---------- 工具 ---------- */
 const NS = 'http://www.w3.org/2000/svg';
@@ -70,16 +72,28 @@ function geom(d) {
 
 /* 字体度量：让字体的 x 高度正好卡在中线和基线之间（60 单位） */
 const fontCache = {};
+const FONT_WEIGHT_STOPS = {
+  Kalam: [300, 400, 700], Andika: [400, 700], 'Comic Neue': [400, 700],
+  Quicksand: [500, 700], Nunito: [500, 700], Fredoka: [400, 500],
+  'Playpen Sans': [400, 600], Poppins: [500, 800], Arial: [400, 700],
+  'Comic Sans MS': [400, 700], 'Patrick Hand': [400],
+};
+function fontWeightFor(font, value = S.weight) {
+  const stops = FONT_WEIGHT_STOPS[font] || [400];
+  const level = value < 90 ? 0 : value < 130 ? 1 : 2;
+  return stops[Math.min(level, stops.length - 1)];
+}
 function fontMetrics(font) {
-  if (fontCache[font]) return fontCache[font];
+  const weight = fontWeightFor(font), key = `${font}:${weight}`;
+  if (fontCache[key]) return fontCache[key];
   const c = document.createElement('canvas').getContext('2d');
-  c.font = `100px "${font}"`;
+  c.font = `${weight} 100px "${font}"`;
   const xh = c.measureText('x').actualBoundingBoxAscent || 50;
-  return (fontCache[font] = { fontSize: 60 / xh * 100 });
+  return (fontCache[key] = { fontSize: 60 / xh * 100 });
 }
 function textWidth(word, font, ls) {
   const m = fontMetrics(font);
-  const t = el('text', { 'font-family': `"${font}"`, 'font-size': m.fontSize, 'letter-spacing': ls }, measureSvg);
+  const t = el('text', { 'font-family': `"${font}"`, 'font-size': m.fontSize, 'font-weight': fontWeightFor(font), 'letter-spacing': ls }, measureSvg);
   t.textContent = word;
   const w = t.getComputedTextLength();
   t.remove();
@@ -103,9 +117,9 @@ function drawWord(parent, word, x, y, k, mode) {
   // ---- 字体模式 ----
   if (mode !== 'guide' && S.font !== 'skeleton') {
     const m = fontMetrics(S.font);
-    const a = { x: 0, y: 100, 'font-family': `"${S.font}"`, 'font-size': m.fontSize, 'letter-spacing': S.letter };
-    if (mode === 'model') Object.assign(a, { fill: '#111', stroke: '#111', 'stroke-width': Math.max(0, (wt - 1) * 6) });
-    if (mode === 'gray') Object.assign(a, { fill: '#cfcfcf', stroke: '#cfcfcf', 'stroke-width': 3 * wt, 'stroke-linejoin': 'round' });
+    const a = { x: 0, y: 100, 'font-family': `"${S.font}"`, 'font-size': m.fontSize, 'font-weight': fontWeightFor(S.font), 'letter-spacing': S.letter };
+    if (mode === 'model') Object.assign(a, { fill: '#111', stroke: '#111', 'stroke-width': S.font === 'Kalam' ? 0 : Math.max(0, (wt - 1) * 6) });
+    if (mode === 'gray') Object.assign(a, { fill: '#cfcfcf', stroke: '#cfcfcf', 'stroke-width': S.font === 'Kalam' ? 0 : 3 * wt, 'stroke-linejoin': 'round' });
     if (mode === 'dashed') Object.assign(a, { fill: 'none', stroke: '#8a8a8a', 'stroke-width': 1.6 * wt, 'stroke-dasharray': '5 4' });
     el('text', a, g).textContent = word;
     return wordWidth(word, mode) * k;
@@ -253,12 +267,15 @@ function labels() {
   sliders.forEach(id => {
     let v = S[id];
     if (id === 'letter') v = v === 0 ? '标准' : (v > 0 ? '+' + v : v);
+    else if (id === 'weight' && S.font === 'Kalam') v = S.weight < 90 ? '细体' : S.weight < 130 ? '常规' : '粗体';
     else v = v + UNIT[id];
     document.getElementById('v_' + id).textContent = v + (S[id] === DEFAULTS[id] && id !== 'letter' ? '（默认）' : '');
   });
   document.getElementById('fontHint').textContent = S.font === 'skeleton'
     ? '单线笔画，和笔顺完全一致，最适合临摹。'
-    : '字体需要联网加载；笔顺示意仍按标准书写体显示。';
+    : S.font === 'Kalam'
+      ? 'Kalam 支持细体、常规和粗体三档；笔顺示意仍按标准书写体显示。'
+      : '字体需要联网加载；笔顺示意仍按标准书写体显示。';
 }
 let timer;
 function update() {
@@ -269,7 +286,7 @@ function update() {
   labels();
   clearTimeout(timer);
   timer = setTimeout(async () => {
-    if (S.font !== 'skeleton') { try { await document.fonts.load(`40px "${S.font}"`); } catch (e) {} delete fontCache[S.font]; }
+    if (S.font !== 'skeleton') { try { await document.fonts.load(`${fontWeightFor(S.font)} 40px "${S.font}"`); } catch (e) {} }
     render();
   }, 60);
 }
